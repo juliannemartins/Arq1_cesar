@@ -1,23 +1,21 @@
-;Nome: Julianne Emanuelle Martins Carrazzoni
-;Cart„o: 00264558
 ;******************************************************************************
 ;
-;	Arquivo de ReferÍncia para o desenvolvimento do kernel.
+;	Arquivo de Refer√™ncia para o desenvolvimento do kernel.
 ;
-;	Vers„o: 2023.1
+;	Vers√£o: 2023.1
 ;
-;	¡reas de memÛria
+;	√Åreas de mem√≥ria
 ;
 ;	0000 - 7FFF		_KERNEL
-;					¡rea de Kernel para implementaÁ„o dos alunos
+;					√Årea de Kernel para implementa√ß√£o dos alunos
 ;
 ;	0100 - 01FF		_VETTAB
-;					Tabela com os vetores das funÁıes do kernel
-;					*** CUIDADO! Esse vetor est· no meio da ·rea de cÛdigo ***
+;					Tabela com os vetores das fun√ß√µes do kernel
+;					*** CUIDADO! Esse vetor est√° no meio da √°rea de c√≥digo ***
 ;
 ;	8000 - FF7F		_APP
-;					¡rea onde ser· colocado o programa de aplicaÁ„o.
-;					Esse programa vai fazer o acesso aos perifÈricos e interrupÁıes, atravÈs das funÁıes do Kernel.
+;					√Årea onde ser√° colocado o programa de aplica√ß√£o.
+;					Esse programa vai fazer o acesso aos perif√©ricos e interrup√ß√µes, atrav√©s das fun√ß√µes do Kernel.
 ;
 ;	FF80 - FFBF 	_IOAREA16
 ;					Area de perifericos, acessada na base 16 bits
@@ -38,18 +36,18 @@ _IOAREA08:	equ	hFFC0
 
 ;
 ;------------------------------------------------------------------------------
-;	¡rea reservada para os perifÈricos
+;	√Årea reservada para os perif√©ricos
 ;------------------------------------------------------------------------------
 
 ; Acesso em 16 bits
 		org		_IOAREA16
 		daw		[31]
-IVET:	dw		0			; Vetor de interrupÁ„o
+IVET:	dw		0			; Vetor de interrup√ß√£o
 
 ; Acesso em 8 bits
 		org		_IOAREA08
 		dab		[23]
-TIMDT:	db		0			; Registro de programaÁ„o do timer
+TIMDT:	db		0			; Registro de programa√ß√£o do timer
 INTS:	db		0			; INTERRUPT STATUS: IP x x x . x x IPStec IPStim
 INTE:	db		0			; INTERRUPT ENABLE: IE x x x . x x IEStec IEStim
 TECST:	db		0			; Status do teclado
@@ -65,7 +63,7 @@ VISOR:	dab		[36]		; Portas de acesso ao visor
 
 ;
 ;------------------------------------------------------------------------------
-;	Area do kernel com os vetores das funÁıes do kernel
+;	Area do kernel com os vetores das fun√ß√µes do kernel
 ;------------------------------------------------------------------------------
 		org		_VETTAB
 		
@@ -80,11 +78,11 @@ VISOR:	dab		[36]		; Portas de acesso ao visor
 		
 ;	
 ;------------------------------------------------------------------------------
-;	CÛdigo de RESET (BOOT) do processador/interrupÁ„o
+;	C√≥digo de RESET (BOOT) do processador/interrup√ß√£o
 ;------------------------------------------------------------------------------
 		org		_RESET
 
-; 1) Desabilitar o sistema de interrupÁıes
+; 1) Desabilitar o sistema de interrup√ß√µes
 
 	clr 	INTE 						;INTE = (00000000)
 	
@@ -92,15 +90,15 @@ VISOR:	dab		[36]		; Portas de acesso ao visor
 
 	mov 	#H7FFF, R6	
 
-; 3) Inicializar as vari·veis internas usadas pelo sistema de interrupÁıes e perifÈricos (IVET, INTE, etc.)
+; 3) Inicializar as vari√°veis internas usadas pelo sistema de interrup√ß√µes e perif√©ricos (IVET, INTE, etc.)
 
-	mov #isr, IVET	; Set Interrupt Service Rotine: #isr È o endereÁo da 
-			; subrotina de interrupÁ„o, este endereÁo È colocado em IVET
+	mov #isr, IVET	; Set Interrupt Service Rotine: #isr √© o endere√ßo da 
+			; subrotina de interrup√ß√£o, este endere√ßo √© colocado em IVET
 						
-	clr INTS	; Reset nos pedidos de interrupÁ„o, limpa o status de interrupÁ„o
+	clr INTS	; Reset nos pedidos de interrup√ß√£o, limpa o status de interrup√ß√£o
 
 ;---------------------------------
-; 4) Inicializar as vari·veis internas do kernel
+; 4) Inicializar as vari√°veis internas do kernel
 
 	clr r0
 	clr r1
@@ -122,7 +120,7 @@ VISOR:	dab		[36]		; Portas de acesso ao visor
 
 ;---------------------------------
 
-; 5) Inicializar o teclado zerando o byte de estado (TECST, endereÁo 65498)
+; 5) Inicializar o teclado zerando o byte de estado (TECST, endere√ßo 65498)
 
 
 	clr TECST	; Reset estado do hardware do teclado, inicializando o teclado
@@ -137,17 +135,17 @@ VISOR:	dab		[36]		; Portas de acesso ao visor
 
  	jsr r7,ClearVisor 
 
-; 8) Habilitar interrupÁıes
+; 8) Habilitar interrup√ß√µes
 
 	mov #h83, INTE ; 1000-0011 teclado e timer habilidados
 
 
-; 9) Retornar para o programa de aplicaÁ„o com um desvio para o endereÁo _APP da memÛria
+; 9) Retornar para o programa de aplica√ß√£o com um desvio para o endere√ßo _APP da mem√≥ria
 	jmp		_APP
 
 ;*******************************************************
 ; void ClearVisor(WORD modo) 
-; funÁ„o que limpa o visor
+; fun√ß√£o que limpa o visor
 
 ;modos:
 	;SE R0 = 0, LIMPA TUDO
@@ -158,7 +156,7 @@ ClearVisor:
 	
 ;limpa todo visor - chamada reset do processador
 
-	;confere se o modo È 0 limpa area toda
+	;confere se o modo √© 0 limpa area toda
 	tst r0
 	bne clear_esq	;se diferente de zero desvia para limpar esquerda
 	mov #VISOR, r0
@@ -166,14 +164,14 @@ ClearVisor:
 clear_visor_loop:
 	mov #' ',(r0)
 	inc r0
-	;se n„o limpa todo visor atÈ o fim:
+	;se n√£o limpa todo visor at√© o fim:
 	cmp r0, #0
 	bne clear_visor_loop
 	br fim_clear
 
 clear_esq:
 	
-	;confere se È 1 o modo
+	;confere se √© 1 o modo
 	;se nao vai pra clear_dir
 	cmp r0, #1
 	bne clear_dir
@@ -198,10 +196,10 @@ clear_dir_loop:
 fim_clear:	rts 	r7
 
 ;================================================================
-; 	ROTINA DE INTERRUP«√O
+; 	ROTINA DE INTERRUP√á√ÉO
 ;	Interrupt Service Routine (ISR)
 ;================================================================
-; SÛ ser· chamada se as interrupÁıes estiverem habilitadas
+; S√≥ ser√° chamada se as interrup√ß√µes estiverem habilitadas
 
 isr: 	
 	;1) salvar o contexto
@@ -217,19 +215,19 @@ isr:
 
 confere_teclado:
 
-	;verifica se o bit que ativa a interrupÁ„o do teclado esta ativado, verifica se È INT do TECLADO
-	mov INTS, r1	;Verifica se È INT do TECLADO
-	and #2, r1	;0000-0010 = interrupÁ„o de teclado ligada
+	;verifica se o bit que ativa a interrup√ß√£o do teclado esta ativado, verifica se √© INT do TECLADO
+	mov INTS, r1	;Verifica se √© INT do TECLADO
+	and #2, r1	;0000-0010 = interrup√ß√£o de teclado ligada
 
-	beq confere_timer	; interrupÁ„o de teclado n„o est· ativa, vai pra verificaÁ„o do timer
+	beq confere_timer	; interrup√ß√£o de teclado n√£o est√° ativa, vai pra verifica√ß√£o do timer
 
-	jsr r7, ISRtec	; subrotina de Tratamento da INTERRUP«√O do TECLADO
+	jsr r7, ISRtec	; subrotina de Tratamento da INTERRUP√á√ÉO do TECLADO
 	and #hFFFD, INTS ; Desliga bit de INT TECLADO
 
 confere_timer:
 
-	mov INTS, r1	;Verifica se È INT do TIMER
-	and #1, r1	;0000-0001 = interrupÁ„o de timer ligada
+	mov INTS, r1	;Verifica se √© INT do TIMER
+	and #1, r1	;0000-0001 = interrup√ß√£o de timer ligada
 	beq ISR3
 	jsr r7, ISRtim	; subrotina de Tratamento da INT do TIMER
 	and #hFFFE, INTS	;Desliga bit de INT TIMER
@@ -246,7 +244,7 @@ ISR3:
 	rti	; Return From Interrupt, rti para salvar os status das flags
 
 ;----------------------------------------------------------------
-; 	TRATAMENTO DE INTERRUP«√O
+; 	TRATAMENTO DE INTERRUP√á√ÉO
 ;	-Teclado 
 ;----------------------------------------------------------------
 ponte_ISRtec1: jmp ISRtec1
@@ -254,10 +252,10 @@ ponte_ISRtec1: jmp ISRtec1
 ISRtec: 
 
 	tst TECST	;testa status do teclado, detecta se algo foi digitado
-	beq ponte_ISRtec1	;Z=1, se n„o estiver ativo, retorna da subrotina
+	beq ponte_ISRtec1	;Z=1, se n√£o estiver ativo, retorna da subrotina
 
 
-;salvando tecla em um vari·vel buffer
+;salvando tecla em um vari√°vel buffer
 
 	mov TECDT, r1		;coloca tecla digitada no r1
 	and #h00FF, r1	;parte menos significativa
@@ -284,7 +282,7 @@ continua: cmp CURSOR, #VISOR
 	  
 	  mov #VISOR, r0
 	  add INDEX_STARTLINE, r0
-	;se r0 passar do limite da area esq n„o podemos apagar a posiÁ„o do visor 
+	;se r0 passar do limite da area esq n√£o podemos apagar a posi√ß√£o do visor 
 	  cmp r0, #VISOR+24	;limite area esquerda
 	  bge dec_index
 	  
@@ -322,7 +320,7 @@ ISRtec1:
 	rts r7			; retorna da subrotina, fim do tratamento do teclado
 
 ;----------------------------------------------------------------
-; 	TRATAMENTO DE INTERRUP«√O
+; 	TRATAMENTO DE INTERRUP√á√ÉO
 ;	-Timer 
 ;----------------------------------------------------------------
 
@@ -344,15 +342,15 @@ fim_ISRtim:	rts r7
 ;quando nao tem tecla nova, r0 != 0, por exemplo: r0 == 1	
 ;------------------------------------------------------------------------------
 kbhit:
-	; Verifica se h· teclas disponÌveis 
+	; Verifica se h√° teclas dispon√≠veis 
 
-		clr r0		; Inicializa, R0 = 0 (h· tecla disponÌvel)
+		clr r0		; Inicializa, R0 = 0 (h√° tecla dispon√≠vel)
 
 		tst BUFFER_INT	; Se uma tecla foi adicionada ao BUFFER, quer dizer que foi digitada, R0 = 0
-		bne fim_kbhit		; Se h· algo no buffer, retorna 0 por R0
+		bne fim_kbhit		; Se h√° algo no buffer, retorna 0 por R0
 
-; N„o h· teclas disponÌveis
-		inc r0                 ; R0 = 1 (n„o h· tecla disponÌvel)
+; N√£o h√° teclas dispon√≠veis
+		inc r0                 ; R0 = 1 (n√£o h√° tecla dispon√≠vel)
 
 fim_kbhit:	rts		r7
 
@@ -368,8 +366,8 @@ getchar:
 
 	;kbhit vai retornar um valor pra r0, precisamos testar 
 
-		;se r0 = 0, h· tecla
-		;se r0 != 0, n„o h· tecla
+		;se r0 = 0, h√° tecla
+		;se r0 != 0, n√£o h√° tecla
 
 		tst r0		;testa r0 depois do khbit
 
@@ -377,13 +375,13 @@ getchar:
 
 		bne getchar		; aguarda tecla pra salvar no buffer
 
-	;Par‚metro de saÌda: registrador R0 com a tecla digitada ou cÛdigo de erro
+	;Par√¢metro de sa√≠da: registrador R0 com a tecla digitada ou c√≥digo de erro
 
 		mov BUFFER_INT, r0		; Salva a tecla em R0
 		clr BUFFER_INT 		; Limpa a variavel que guarda a tecla
 
 
-	;Caso ocorra algum erro, a funÁ„o deve retornar HFFFF.
+	;Caso ocorra algum erro, a fun√ß√£o deve retornar HFFFF.
 		;...
 
 		
@@ -393,7 +391,7 @@ getchar:
 ; WORD	putchar(WORD area, BYTE caractere)
 ; WORD	putchar(WORD area, BYTE caractere, WORD pos)
 ;
-; Essa funÁ„o para solicitar ao kernel que seja colocado um caractere na ·rea esquerda ou na ·rea direita do visor.
+; Essa fun√ß√£o para solicitar ao kernel que seja colocado um caractere na √°rea esquerda ou na √°rea direita do visor.
 ;------------------------------------------------------------------------------
 
 erro_putchar2: jmp erro_putchar
@@ -410,33 +408,33 @@ putchar:
 ;direita != 0
 
 ;trata caracteres especiais:
-;O back space (ASCII H08) move o cursor uma posiÁ„o para a esquerda. 
-;Caso o cursor esteja na posiÁ„o mais a esquerda da ·rea, o cursor n„o deve ser alterado;
+;O back space (ASCII H08) move o cursor uma posi√ß√£o para a esquerda. 
+;Caso o cursor esteja na posi√ß√£o mais a esquerda da √°rea, o cursor n√£o deve ser alterado;
 
 backspace:	cmp r4, #h08		; compara o que foi digitado como a tecla Backspace (ASCII H08)
-		bne carriage_return	; n„o È backspace, conferimos se n„o È carriage return
+		bne carriage_return	; n√£o √© backspace, conferimos se n√£o √© carriage return
 	
 	;se for backspace...
 	
-		cmp CURSOR, #VISOR	;compara a posiÁ„o do cursor com a posiÁ„o do visor
-		ble erro_putchar2	; se posiÁ„o do cursor -menor ou igual- a do visor, foi o maximo a esquerda, n„o faz nada com cursor
-		;caso seja possÌvel movimentar o cursor, decrementa sua posiÁ„o
+		cmp CURSOR, #VISOR	;compara a posi√ß√£o do cursor com a posi√ß√£o do visor
+		ble erro_putchar2	; se posi√ß√£o do cursor -menor ou igual- a do visor, foi o maximo a esquerda, n√£o faz nada com cursor
+		;caso seja poss√≠vel movimentar o cursor, decrementa sua posi√ß√£o
 		dec CURSOR
 		jmp deu_certo_putchar
 
 carriage_return:
-;O carriage return (ASCII H0D) posiciona o cursor na posiÁ„o mais a esquerda da ·rea;
+;O carriage return (ASCII H0D) posiciona o cursor na posi√ß√£o mais a esquerda da √°rea;
 
-		cmp r4, #h0D			;compara se o caracter digitado È (ASCII H0D)
-		bne line_feed			; n„o È carriage_return, conferimos se n„o È line_feed
+		cmp r4, #h0D			;compara se o caracter digitado √© (ASCII H0D)
+		bne line_feed			; n√£o √© carriage_return, conferimos se n√£o √© line_feed
 		mov #VISOR, CURSOR		
 		br deu_certo_putchar
 
 line_feed:
-;O line feed (ASCII H0A) limpa a ·rea (preenche com SPACE). A posiÁ„o do cursor n„o deve ser alterado.
+;O line feed (ASCII H0A) limpa a √°rea (preenche com SPACE). A posi√ß√£o do cursor n√£o deve ser alterado.
 
-		cmp r4, #h0A			;compara se o caracter digitado È (ASCII H0A)
-		bne char_de_controle		; n„o È line_feed, trata caracter de controle
+		cmp r4, #h0A			;compara se o caracter digitado √© (ASCII H0A)
+		bne char_de_controle		; n√£o √© line_feed, trata caracter de controle
 		
 		;;testar pra startline
 
@@ -445,7 +443,7 @@ line_feed:
 		br deu_certo_putchar
 ;----------------------------------------------
 form_feed:
-;O form feed (ASCII H0C) limpa a ·rea (preenche com SPACE).
+;O form feed (ASCII H0C) limpa a √°rea (preenche com SPACE).
 	
 	;	UTILIZA Flag_startline
 	;	para AREA DA DIREITA, 
@@ -579,7 +577,7 @@ fim_putmsg:	rts		r7
 ;------------------------------------------------------------------------------
 startline:
 
-	;verifica se est· na ·rea apropriada da aplicaÁ„o
+	;verifica se est√° na √°rea apropriada da aplica√ß√£o
 	cmp r5, #h8000
 	bcs erro_startline
 
@@ -623,7 +621,7 @@ fim_startline:		rts		r7
 getline:
 
 ;R5 == 0:
-	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n„o: IN_STARTLINE = 0
+	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n√£o: IN_STARTLINE = 0
 
 	cmp r5, #0
 	bne cmp_r5_1
@@ -634,18 +632,18 @@ getline:
 	br fim_getline
 ;----------------------------------------------
 ;R5 == 1:
-	;1 - Se IN_STARTLINE == 0: R0 = 0; se n„o: R0 = 65535
+	;1 - Se IN_STARTLINE == 0: R0 = 0; se n√£o: R0 = 65535
 
 cmp_r5_1:	cmp r5, #1	
 		bne cmp_r5_2
 
 		tst Flag_startline
-		bne erro_getline	;n„o terminei de ler
+		bne erro_getline	;n√£o terminei de ler
 		clr r0
 		br fim_getline
 ;--------------------------------------------------
 ;R5 == 2:
-	;1 - Se FIRST_STARTLINE == 0: R0 = 0; se n„o: R0 = TIMER_STARTLINE
+	;1 - Se FIRST_STARTLINE == 0: R0 = 0; se n√£o: R0 = TIMER_STARTLINE
 
 cmp_r5_2:	cmp r5, #2
 		bne cmp_r5_3
@@ -659,7 +657,7 @@ continua_cmp_r5_2:	mov TIMER_STARTLINE, r0
 
 ;-------------------------------------------------
 ;R5 == 3:
-	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n„o: R0 = BUFF_STARTLINE
+	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n√£o: R0 = BUFF_STARTLINE
 
 cmp_r5_3:	cmp r5, #3
 		bne cmp_r5_4
@@ -670,7 +668,7 @@ cmp_r5_3:	cmp r5, #3
 
 ;----------------------------------------------
 ;R5 == 4:
-	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n„o: R0 = INDEX_STARTLINE
+	;1 - Se FIRST_STARTLINE == 0: R0 = 65535; se n√£o: R0 = INDEX_STARTLINE
 
 cmp_r5_4:	cmp r5, #4
 		bne erro_getline
@@ -687,12 +685,12 @@ erro_getline:	mov #65535, r0
 fim_getline:	rts		r7
 
 ;================================================================
-;	 Constantes e vari·veis 
+;	 Constantes e vari√°veis 
 ;================================================================
 
-BUFFER_INT:	dw 0		; Variavel que guarda a ˙ltima tecla digitada pelo teclado
+BUFFER_INT:	dw 0		; Variavel que guarda a √∫ltima tecla digitada pelo teclado
 
-CURSOR:		dw	0		; posiÁ„o do cursor no visor 
+CURSOR:		dw	0		; posi√ß√£o do cursor no visor 
 Flag_startline: dw	0	;flag que verifica se startline ativa
 limite_area_esquerda: equ 24
 
